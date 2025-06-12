@@ -29,8 +29,8 @@ const Tasks = () => {
   const [newTask, setNewTask] = useState({
     title: '',
     description: '',
-    priority: 'medium' as const,
-    category: 'daily' as const,
+    priority: 'medium' as 'low' | 'medium' | 'high',
+    category: 'daily' as 'daily' | 'weekly' | 'monthly',
     dueDate: ''
   });
 
@@ -139,7 +139,7 @@ const Tasks = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="priority">Priority</Label>
-                    <Select value={newTask.priority} onValueChange={(value) => setNewTask({...newTask, priority: value as 'low' | 'medium' | 'high'})}>
+                    <Select value={newTask.priority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -152,7 +152,7 @@ const Tasks = () => {
                   </div>
                   <div>
                     <Label htmlFor="category">Category</Label>
-                    <Select value={newTask.category} onValueChange={(value) => setNewTask({...newTask, category: value as 'daily' | 'weekly' | 'monthly'})}>
+                    <Select value={newTask.category} onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setNewTask({...newTask, category: value})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
