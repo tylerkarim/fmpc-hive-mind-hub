@@ -2,24 +2,17 @@
 import { useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { Pen, CheckSquare, Clock, FileText, MessageCircle, Plus, TrendingUp } from "lucide-react";
+import { Pen, CheckSquare, Clock, FileText, MessageCircle, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 const Dashboard = () => {
-  const [currentTime, setCurrentTime] = useState(new Date());
-
-  // Mock data for demonstration
-  const todayTasks = [
-    { id: 1, title: "Review Pharmacology Chapter 5", completed: false, priority: "high" },
-    { id: 2, title: "Complete Anatomy Assignment", completed: true, priority: "medium" },
-    { id: 3, title: "Study for Pathology Quiz", completed: false, priority: "high" },
-  ];
-
-  const weeklyProgress = 65;
-  const pomodoroToday = 4;
-  const documentsCount = 23;
+  // Empty state - user starts fresh
+  const todayTasks = 0;
+  const completedTasks = 0;
+  const pomodoroToday = 0;
+  const documentsCount = 0;
+  const weeklyProgress = 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -52,8 +45,8 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Welcome Section */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">Welcome back, Student!</h1>
-          <p className="text-muted-foreground">Here's your academic progress for today</p>
+          <h1 className="text-3xl font-bold mb-2">Welcome to Aji Nqraw!</h1>
+          <p className="text-muted-foreground">Start organizing your academic life - create your first task or begin a study session</p>
         </div>
 
         {/* Stats Cards */}
@@ -64,9 +57,9 @@ const Dashboard = () => {
               <CheckSquare className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{todayTasks.filter(t => !t.completed).length}</div>
+              <div className="text-2xl font-bold">{todayTasks}</div>
               <p className="text-xs text-muted-foreground">
-                {todayTasks.filter(t => t.completed).length} completed
+                {completedTasks} completed
               </p>
             </CardContent>
           </Card>
@@ -106,36 +99,18 @@ const Dashboard = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-          {/* Today's Tasks */}
+          {/* Getting Started */}
           <Card>
             <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Today's Tasks</CardTitle>
-                  <CardDescription>Your focus for today</CardDescription>
-                </div>
-                <Button size="sm" asChild>
-                  <Link to="/tasks">
-                    <Plus className="h-4 w-4" />
-                  </Link>
-                </Button>
-              </div>
+              <CardTitle>Get Started</CardTitle>
+              <CardDescription>Begin your academic journey with Aji Nqraw</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {todayTasks.map((task) => (
-                  <div key={task.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
-                    <div className="flex items-center space-x-3">
-                      <div className={`w-2 h-2 rounded-full ${task.priority === 'high' ? 'bg-red-500' : 'bg-yellow-500'}`} />
-                      <span className={task.completed ? 'line-through text-muted-foreground' : ''}>
-                        {task.title}
-                      </span>
-                    </div>
-                    <Badge variant={task.completed ? "secondary" : "default"}>
-                      {task.completed ? "Done" : "Pending"}
-                    </Badge>
-                  </div>
-                ))}
+                <p className="text-muted-foreground">Welcome! You haven't created any tasks yet. Start by creating your first task to organize your studies.</p>
+                <Button asChild className="w-full">
+                  <Link to="/tasks">Create Your First Task</Link>
+                </Button>
               </div>
             </CardContent>
           </Card>
@@ -144,7 +119,7 @@ const Dashboard = () => {
           <Card>
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
-              <CardDescription>Get started with your study session</CardDescription>
+              <CardDescription>Jump into your study tools</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-2 gap-4">
@@ -163,7 +138,7 @@ const Dashboard = () => {
                 <Button asChild variant="outline" className="h-20 flex-col">
                   <Link to="/documents">
                     <FileText className="h-6 w-6 mb-2" />
-                    View Documents
+                    Upload Documents
                   </Link>
                 </Button>
                 <Button asChild variant="outline" className="h-20 flex-col">

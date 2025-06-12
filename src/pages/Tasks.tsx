@@ -24,46 +24,7 @@ interface Task {
 }
 
 const Tasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: 1,
-      title: "Review Pharmacology Chapter 5",
-      description: "Study drug interactions and mechanisms",
-      priority: 'high',
-      category: 'daily',
-      completed: false,
-      dueDate: '2024-06-15',
-      subtasks: [
-        { id: 1, title: "Read pages 150-175", completed: true },
-        { id: 2, title: "Make summary notes", completed: false },
-        { id: 3, title: "Complete practice questions", completed: false }
-      ]
-    },
-    {
-      id: 2,
-      title: "Complete Anatomy Assignment",
-      description: "Cardiovascular system diagrams",
-      priority: 'medium',
-      category: 'weekly',
-      completed: true,
-      dueDate: '2024-06-20',
-      subtasks: []
-    },
-    {
-      id: 3,
-      title: "Prepare for Final Exams",
-      description: "Comprehensive study plan for all subjects",
-      priority: 'high',
-      category: 'monthly',
-      completed: false,
-      dueDate: '2024-07-01',
-      subtasks: [
-        { id: 4, title: "Create study schedule", completed: false },
-        { id: 5, title: "Gather all notes", completed: false },
-        { id: 6, title: "Form study group", completed: false }
-      ]
-    }
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const [newTask, setNewTask] = useState({
     title: '',
@@ -178,7 +139,7 @@ const Tasks = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="priority">Priority</Label>
-                    <Select value={newTask.priority} onValueChange={(value: 'low' | 'medium' | 'high') => setNewTask({...newTask, priority: value})}>
+                    <Select value={newTask.priority} onValueChange={(value) => setNewTask({...newTask, priority: value as 'low' | 'medium' | 'high'})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -191,7 +152,7 @@ const Tasks = () => {
                   </div>
                   <div>
                     <Label htmlFor="category">Category</Label>
-                    <Select value={newTask.category} onValueChange={(value: 'daily' | 'weekly' | 'monthly') => setNewTask({...newTask, category: value})}>
+                    <Select value={newTask.category} onValueChange={(value) => setNewTask({...newTask, category: value as 'daily' | 'weekly' | 'monthly'})}>
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
