@@ -1,13 +1,10 @@
-
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Pen, CheckSquare, Clock, FileText, MessageCircle, Target, Calendar, Star } from "lucide-react";
 import { Link } from "react-router-dom";
-
 const Index = () => {
-  return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -43,7 +40,7 @@ const Index = () => {
           </Badge>
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
             Enhance your academic control with{" "}
-            <span className="text-blue-600">Aji Nqraw</span>
+            <span className="text-blue-600">us</span>
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             The ultimate productivity platform for medical and pharmacy students. 
@@ -162,8 +159,6 @@ const Index = () => {
           </p>
         </div>
       </footer>
-    </div>
-  );
+    </div>;
 };
-
 export default Index;
