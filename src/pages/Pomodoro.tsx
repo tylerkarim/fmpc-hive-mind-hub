@@ -1,68 +1,36 @@
 
-import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Pen, Play, Pause, RotateCcw, Settings, Clock } from "lucide-react";
+import { Pen, Play, Pause, RotateCcw, Settings, Clock, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePomodoro } from "@/contexts/PomodoroContext";
 
 const Pomodoro = () => {
-  const [workTime, setWorkTime] = useState(25); // minutes
-  const [breakTime, setBreakTime] = useState(5); // minutes
-  const [longBreakTime, setLongBreakTime] = useState(15); // minutes
-  const [currentTime, setCurrentTime] = useState(workTime * 60); // seconds
-  const [isRunning, setIsRunning] = useState(false);
-  const [currentSession, setCurrentSession] = useState<'work' | 'break' | 'longBreak'>('work');
-  const [completedPomodoros, setCompletedPomodoros] = useState(0);
-  const [totalSessions, setTotalSessions] = useState(0);
-
-  useEffect(() => {
-    let interval: NodeJS.Timeout;
-    
-    if (isRunning && currentTime > 0) {
-      interval = setInterval(() => {
-        setCurrentTime(prev => prev - 1);
-      }, 1000);
-    } else if (currentTime === 0 && isRunning) {
-      // Session completed
-      if (currentSession === 'work') {
-        setCompletedPomodoros(prev => prev + 1);
-        setTotalSessions(prev => prev + 1);
-        // Determine next session type
-        if ((completedPomodoros + 1) % 4 === 0) {
-          setCurrentSession('longBreak');
-          setCurrentTime(longBreakTime * 60);
-        } else {
-          setCurrentSession('break');
-          setCurrentTime(breakTime * 60);
-        }
-      } else {
-        setCurrentSession('work');
-        setCurrentTime(workTime * 60);
-      }
-      setIsRunning(false);
-    }
-
-    return () => clearInterval(interval);
-  }, [isRunning, currentTime, currentSession, workTime, breakTime, longBreakTime, completedPomodoros]);
+  const { signOut } = useAuth();
+  const {
+    workTime,
+    breakTime,
+    longBreakTime,
+    currentTime,
+    isRunning,
+    currentSession,
+    completedPomodoros,
+    totalSessions,
+    startTimer,
+    pauseTimer,
+    resetTimer,
+    updateSettings
+  } = usePomodoro();
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
     const secs = seconds % 60;
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-  };
-
-  const startTimer = () => setIsRunning(true);
-  const pauseTimer = () => setIsRunning(false);
-  
-  const resetTimer = () => {
-    setIsRunning(false);
-    setCurrentSession('work');
-    setCurrentTime(workTime * 60);
   };
 
   const getSessionDuration = () => {
@@ -97,6 +65,15 @@ const Pomodoro = () => {
     }
   };
 
+  const handleSettingsUpdate = (field: string, value: number) => {
+    const newSettings = {
+      workTime: field === 'workTime' ? value : workTime,
+      breakTime: field === 'breakTime' ? value : breakTime,
+      longBreakTime: field === 'longBreakTime' ? value : longBreakTime
+    };
+    updateSettings(newSettings);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
@@ -120,6 +97,10 @@ const Pomodoro = () => {
               <Link to="/assistant" className="text-muted-foreground hover:text-foreground transition-colors">
                 AI Assistant
               </Link>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </nav>
         </div>
@@ -217,7 +198,7 @@ const Pomodoro = () => {
                       id="workTime"
                       type="number"
                       value={workTime}
-                      onChange={(e) => setWorkTime(Number(e.target.value))}
+                      onChange={(e) => handleSettingsUpdate('workTime', Number(e.target.value))}
                       disabled={isRunning}
                     />
                   </div>
@@ -227,7 +208,7 @@ const Pomodoro = () => {
                       id="breakTime"
                       type="number"
                       value={breakTime}
-                      onChange={(e) => setBreakTime(Number(e.target.value))}
+                      onChange={(e) => handleSettingsUpdate('breakTime', Number(e.target.value))}
                       disabled={isRunning}
                     />
                   </div>
@@ -237,7 +218,7 @@ const Pomodoro = () => {
                       id="longBreakTime"
                       type="number"
                       value={longBreakTime}
-                      onChange={(e) => setLongBreakTime(Number(e.target.value))}
+                      onChange={(e) => handleSettingsUpdate('longBreakTime', Number(e.target.value))}
                       disabled={isRunning}
                     />
                   </div>

@@ -3,8 +3,22 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Pen, CheckSquare, Clock, FileText, MessageCircle, Target, Calendar, Star } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
+
 const Index = () => {
-  return <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
+  const { user } = useAuth();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard');
+    }
+  }, [user, navigate]);
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
       {/* Header */}
       <header className="container mx-auto px-4 py-6">
         <nav className="flex items-center justify-between">
@@ -38,20 +52,19 @@ const Index = () => {
           <Badge variant="secondary" className="mb-4 bg-blue-100 text-blue-700">
             For FMPC Students
           </Badge>
-          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-blue-800 bg-clip-text text-transparent">
-            Enhance your academic control with{" "}
-            <span className="text-blue-600">us</span>
+          <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+            Master Your Academic Journey
           </h1>
-          <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            The ultimate productivity platform for medical and pharmacy students. 
-            Manage tasks, study with focus, and excel in your academic journey.
+          <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
+            Transform your study habits with our comprehensive suite of academic tools. 
+            From task management to focused study sessions, we've got everything you need to excel.
           </p>
-          <div className="flex justify-center space-x-4">
-            <Button size="lg" asChild>
-              <Link to="/dashboard">Start Learning</Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button size="lg" className="text-lg px-8" asChild>
+              <Link to="/auth">Get Started</Link>
             </Button>
-            <Button size="lg" variant="outline">
-              Learn More
+            <Button size="lg" variant="outline" className="text-lg px-8" asChild>
+              <Link to="/auth">Sign In</Link>
             </Button>
           </div>
         </div>
@@ -159,6 +172,8 @@ const Index = () => {
           </p>
         </div>
       </footer>
-    </div>;
+    </div>
+  );
 };
+
 export default Index;

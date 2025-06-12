@@ -9,7 +9,147 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
-      [_ in never]: never
+      documents: {
+        Row: {
+          annotations: Json | null
+          created_at: string
+          file_type: string | null
+          file_url: string | null
+          id: string
+          subject: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          annotations?: Json | null
+          created_at?: string
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          subject?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          annotations?: Json | null
+          created_at?: string
+          file_type?: string | null
+          file_url?: string | null
+          id?: string
+          subject?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      pomodoro_sessions: {
+        Row: {
+          break_time: number | null
+          completed_pomodoros: number | null
+          created_at: string
+          current_session: string | null
+          id: string
+          long_break_time: number | null
+          session_date: string | null
+          total_sessions: number | null
+          updated_at: string
+          user_id: string
+          work_time: number | null
+        }
+        Insert: {
+          break_time?: number | null
+          completed_pomodoros?: number | null
+          created_at?: string
+          current_session?: string | null
+          id?: string
+          long_break_time?: number | null
+          session_date?: string | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id: string
+          work_time?: number | null
+        }
+        Update: {
+          break_time?: number | null
+          completed_pomodoros?: number | null
+          created_at?: string
+          current_session?: string | null
+          id?: string
+          long_break_time?: number | null
+          session_date?: string | null
+          total_sessions?: number | null
+          updated_at?: string
+          user_id?: string
+          work_time?: number | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          category: string | null
+          completed: boolean | null
+          created_at: string
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string | null
+          completed?: boolean | null
+          created_at?: string
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

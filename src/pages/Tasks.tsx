@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -9,22 +9,27 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { Pen, Plus, Edit, Trash2, Calendar, Clock, CheckSquare } from "lucide-react";
+import { Pen, Plus, Edit, Trash2, Calendar, CheckSquare, LogOut } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 interface Task {
-  id: number;
+  id: string;
   title: string;
   description: string;
   priority: 'low' | 'medium' | 'high';
   category: 'daily' | 'weekly' | 'monthly';
   completed: boolean;
-  dueDate: string;
-  subtasks: Array<{ id: number; title: string; completed: boolean }>;
+  due_date: string;
 }
 
 const Tasks = () => {
+  const { user, signOut } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   const [newTask, setNewTask] = useState({
     title: '',
@@ -34,27 +39,78 @@ const Tasks = () => {
     dueDate: ''
   });
 
-  const addTask = () => {
-    if (newTask.title.trim()) {
-      const task: Task = {
-        id: Date.now(),
-        ...newTask,
-        completed: false,
-        subtasks: []
-      };
-      setTasks([...tasks, task]);
+  useEffect(() => {
+    if (user) {
+      fetchTasks();
+    }
+  }, [user]);
+
+  const fetchTasks = async () => {
+    if (!user) return;
+    
+    const { data, error } = await supabase
+      .from('tasks')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      toast.error('Failed to load tasks');
+    } else {
+      setTasks(data || []);
+    }
+    setLoading(false);
+  };
+
+  const addTask = async () => {
+    if (!user || !newTask.title.trim()) return;
+
+    const { error } = await supabase
+      .from('tasks')
+      .insert({
+        user_id: user.id,
+        title: newTask.title,
+        description: newTask.description,
+        priority: newTask.priority,
+        category: newTask.category,
+        due_date: newTask.dueDate || null
+      });
+
+    if (error) {
+      toast.error('Failed to create task');
+    } else {
+      toast.success('Task created successfully');
       setNewTask({ title: '', description: '', priority: 'medium', category: 'daily', dueDate: '' });
+      setDialogOpen(false);
+      fetchTasks();
     }
   };
 
-  const toggleTask = (id: number) => {
-    setTasks(tasks.map(task => 
-      task.id === id ? { ...task, completed: !task.completed } : task
-    ));
+  const toggleTask = async (id: string, completed: boolean) => {
+    const { error } = await supabase
+      .from('tasks')
+      .update({ completed: !completed })
+      .eq('id', id);
+
+    if (error) {
+      toast.error('Failed to update task');
+    } else {
+      fetchTasks();
+    }
   };
 
-  const deleteTask = (id: number) => {
-    setTasks(tasks.filter(task => task.id !== id));
+  const deleteTask = async (id: string) => {
+    const { error } = await supabase
+      .from('tasks')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast.error('Failed to delete task');
+    } else {
+      toast.success('Task deleted');
+      fetchTasks();
+    }
   };
 
   const getPriorityColor = (priority: string) => {
@@ -69,6 +125,17 @@ const Tasks = () => {
   const filterTasksByCategory = (category: string) => {
     return tasks.filter(task => task.category === category);
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-muted-foreground">Loading tasks...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-blue-100">
@@ -93,6 +160,10 @@ const Tasks = () => {
               <Link to="/assistant" className="text-muted-foreground hover:text-foreground transition-colors">
                 AI Assistant
               </Link>
+              <Button variant="outline" size="sm" onClick={signOut}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
             </div>
           </nav>
         </div>
@@ -105,7 +176,7 @@ const Tasks = () => {
             <p className="text-muted-foreground">Organize and prioritize your academic goals</p>
           </div>
           
-          <Dialog>
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
             <DialogTrigger asChild>
               <Button>
                 <Plus className="h-4 w-4 mr-2" />
@@ -195,7 +266,7 @@ const Tasks = () => {
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-3">
                           <button 
-                            onClick={() => toggleTask(task.id)}
+                            onClick={() => toggleTask(task.id, task.completed)}
                             className={`w-5 h-5 rounded border-2 flex items-center justify-center ${
                               task.completed ? 'bg-blue-600 border-blue-600' : 'border-gray-300'
                             }`}
@@ -209,10 +280,12 @@ const Tasks = () => {
                         </div>
                         <div className="flex items-center space-x-2">
                           <div className={`w-3 h-3 rounded-full ${getPriorityColor(task.priority)}`} />
-                          <Badge variant="outline">
-                            <Calendar className="h-3 w-3 mr-1" />
-                            {task.dueDate}
-                          </Badge>
+                          {task.due_date && (
+                            <Badge variant="outline">
+                              <Calendar className="h-3 w-3 mr-1" />
+                              {task.due_date}
+                            </Badge>
+                          )}
                           <Button size="sm" variant="ghost">
                             <Edit className="h-4 w-4" />
                           </Button>
@@ -222,19 +295,6 @@ const Tasks = () => {
                         </div>
                       </div>
                     </CardHeader>
-                    {task.subtasks.length > 0 && (
-                      <CardContent>
-                        <div className="space-y-2">
-                          <h4 className="font-medium text-sm">Subtasks:</h4>
-                          {task.subtasks.map((subtask) => (
-                            <div key={subtask.id} className="flex items-center space-x-2 text-sm">
-                              <div className={`w-3 h-3 rounded border ${subtask.completed ? 'bg-blue-600 border-blue-600' : 'border-gray-300'}`} />
-                              <span className={subtask.completed ? 'line-through text-muted-foreground' : ''}>{subtask.title}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    )}
                   </Card>
                 ))}
                 {filterTasksByCategory(category).length === 0 && (
